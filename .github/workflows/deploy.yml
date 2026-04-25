@@ -1,31 +1,30 @@
-name: Hair Website CI
+name: CI Test
 
 on:
   push:
     branches: ["main"]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Build Docker image
+    - name: Build image
       run: docker build -t hair-site .
 
     - name: Run container
-      run: docker run -d -p 8080:80 hair-site
+      run: docker run -d -p 8080:80 --name web hair-site
 
-    - name: Wait for container to start
-      run: sleep 10
+    - name: Wait for startup
+      run: sleep 8
 
-    - name: Check logs (debug step)
-      run: docker logs web
+    - name: Check containers
+      run: docker ps -a
 
-    - name: Test website
-      run: curl --retry 5 --retry-delay 3 http://localhost:8080
+    - name: Test endpoint
+      run: curl --fail http://localhost:8080
 
-    - name: Stop container
-      run: docker stop web
+    - name: Cleanup
+      run: docker stop web || true
