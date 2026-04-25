@@ -18,5 +18,14 @@ jobs:
     - name: Run container
       run: docker run -d -p 8080:80 hair-site
 
-    - name: Test site
-      run: curl http://localhost:8080
+    - name: Wait for container to start
+      run: sleep 10
+
+    - name: Check logs (debug step)
+      run: docker logs web
+
+    - name: Test website
+      run: curl --retry 5 --retry-delay 3 http://localhost:8080
+
+    - name: Stop container
+      run: docker stop web
